@@ -1,24 +1,71 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import QuickNote from "./components/QuickNote";
+import { supabase } from "./supabaseClient";
 
 function App() {
   const [notes, setnotes] = useState([]);
 
-  function addNote() {
-    setnotes([
-      ...notes,
-      { id: Date.now(), text: "Click edit to write your note" },
-    ]);
+  useEffect(() => {
+    fetchNotes();
+  }, []);
+
+  const fetchNotes = async () => {
+    try {
+      let { data, error } = await supabase.from("notes").select("*");
+      if (error) {
+        throw error;
+      }
+      setnotes(data || []);
+    } catch (error) {
+      console.error("Error fetching notes", error);
+    }
+  };
+
+  async function addNote() {
+    try {
+      const { data, error } = await supabase
+        .from("notes")
+        .insert([{ text: "Click edit to write your note" }])
+        .select();
+      if (error) {
+        throw error;
+      }
+      setnotes([...notes, ...data]);
+    } catch (error) {
+      console.error("Error fetching notes", error);
+    }
   }
-  function updateNote(id, newText) {
-    setnotes((previousNotes) =>
-      previousNotes.map((note) =>
-        note.id == id ? { id, text: newText } : note
-      )
-    );
+  async function updateNote(id, newText) {
+    try {
+      const { data, error } = await supabase
+        .from("notes")
+        .update({ text: newText })
+        .eq("id", id)
+        .select();
+      if (error) {
+        throw error;
+      }
+      setnotes((previousNotes) =>
+        previousNotes.map((note) =>
+          note.id == id ? { id, text: newText } : note
+        )
+      );
+    } catch (error) {
+      console.error("Error fetching notes", error);
+    }
   }
-  function deleteNote(id) {
-    setnotes((previousNotes) => previousNotes.filter((note) => note.id !== id));
+  async function deleteNote(id) {
+    try {
+      const { error } = await supabase.from("notes").delete().eq("id", id);
+      if (error) {
+        throw error;
+      }
+      setnotes((previousNotes) =>
+        previousNotes.filter((note) => note.id !== id)
+      );
+    } catch (error) {
+      console.error("Error fetching notes", error);
+    }
   }
 
   return (
