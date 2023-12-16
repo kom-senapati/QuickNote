@@ -69,8 +69,8 @@ function App() {
   }
 
   return (
-    <>
-      <h1 className="text-white font-bold text-5xl italic m-3 ml-5">
+    <div className="top-0 bottom-0 left-0 right-0 fixed bg-[#242629]">
+      <h1 className="text-[#fffffe] font-bold text-5xl text-center italic m-3 ml-5">
         Quick Note
       </h1>
       <div className="text-center">
@@ -105,7 +105,7 @@ function App() {
           />
         ))}
       </div>
-    </>
+    </div>
   );
 }
 
